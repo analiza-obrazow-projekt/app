@@ -1,0 +1,24 @@
+<html>
+<head>
+  <title>Shortest Path Calculator</title>
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  <py-config type="toml">
+    packages = ["matplotlib", "pandas", "opencv-python", "numpy"]
+
+    [[fetch]]
+    files = ["./main.py"]
+  </py-config>
+ </head>
+<body>
+  <py-script src="main.py"></py-script>
+  <button
+      id="corner-btn"
+      class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"
+      type="submit"
+      py-click="calculateShortestPath()"
+    >Oblicz sciezke
+  </button>
+</body>
+
+</html>
