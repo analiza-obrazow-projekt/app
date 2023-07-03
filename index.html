@@ -1,4 +1,5 @@
 <html>
+<meta charset="UTF-8">
 <head>
   <title>Shortest Path Calculator</title>
   <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
@@ -9,9 +10,33 @@
     [[fetch]]
     files = ["./main.py"]
   </py-config>
+  <py-script>
+    import pyodide, asyncio
+    async def import():
+      await micropip.install("opencv-python")
+      await micropip.install("numpy")
+      await micropip.install("pandas")
+      await micropip.install("matplotlib")
+      print(pyodide.__version__)
+    
+    asyncio.ensure_future(import()) 
+  </py-script>
  </head>
 <body>
   <py-script src="main.py"></py-script>
+  <h1>Analiza i przetwarzanie obrazów</h1>
+  <h2>Projekt - Wyszukiwanie najkrótszej ścieżki na obrazie</h2>
+  <h3>1. Wczytanie obrazu:</h3>
+  <form action="..." enctype="multipart/form-data">
+    <input type="file" id="fileUpload" name="filename" accept="image/*">
+    <button
+      id="upload"
+      class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"
+      type="button"
+      py-click="fileUpload()"
+    >Zapisz
+    </button>
+  </form>
   <button
       id="corner-btn"
       class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"

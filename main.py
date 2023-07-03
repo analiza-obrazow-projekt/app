@@ -6,10 +6,11 @@ import js
 import numpy as np
 import pyscript
 from pyodide.http import pyfetch
+from js import document
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import numpy as np
-
+import os
 
 async def calculateShortestPath():
     #TODO: Logic to calculate the shortest path
@@ -23,4 +24,5 @@ def drawResult():
    x = plt.plot(x_values, y_values)
    plt.show(x)
 
-
+def fileUpload():
+    print("upload file")
