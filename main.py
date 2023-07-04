@@ -5,10 +5,16 @@ import json
 import js
 import numpy as np
 import pyscript
+from pyscript import display
 from pyodide.http import pyfetch
 from js import document
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
+import math
+from matplotlib import pyplot
+import random
+from io import BytesIO
+
 import numpy as np
 import os
 import pyodide
@@ -20,22 +26,49 @@ def load_image(path):
 
 # pyodide.register_js_function(load_image)
 
-async def calculateShortestPath():
+def calculateShortestPath():
     #TODO: Logic to calculate the shortest path
-    print('Calculating shortest path')
-    print('Your open-cv version is:')
-    print(cv2.__version__)
+    drawResult()
+    readFile("test.jpg")
+    showImage()
+    
+    
+            
     
 def drawResult():
-   x_values = [1, 2, 3, 4, 5]
-   y_values = [2, 4, 6, 8, 10]
-   x = plt.plot(x_values, y_values)
-   plt.show(x)
+    fig, ax = plt.subplots()
+    # x axis
+    x = ["Python", "C++", "JavaScript", "Golang"]
+    # y axis
+    y = [10, 5, 9, 7]
+    plt.plot(x, y, marker='o', linestyle='-', color='b')
+    # Naming the x-label
+    plt.xlabel('Language')
+    # Naming the y-label
+    plt.ylabel('Score')
+    
+    # Naming the title of the plot
+    plt.title('Language vs Score')
+    display(fig,target="matplotlib-lineplot")
+    
+#fi = form['filename']
+#    if fi.filename:
+	    # This code will strip the leading absolute path from your file-name
+#        load_image(os.path.basename(fi.filename))    
+#    print("FILEUPLOAD")
+
 
 def fileUpload():
-    fi = form['filename']
-    if fi.filename:
-	    # This code will strip the leading absolute path from your file-name
-        load_image(os.path.basename(fi.filename))    
-    print("FILEUPLOAD")
+    print("upload file")
+
+def readFile(filename):
+    display("wczytana tablica",target="matplotlib-lineplot")
+    display(cv2.imread(filename),target="matplotlib-lineplot")
+
+def showImage():
+    fig, ax = plt.subplots()
+    plt.imshow(cv2.imread("test.jpg"))
+    display("wczytany obraz",target="matplotlib-lineplot")
+    display(fig, target="matplotlib-lineplot")
+
 
