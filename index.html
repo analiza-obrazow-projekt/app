@@ -1,6 +1,9 @@
-<html>
-<meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="pl">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Shortest Path Calculator</title>
   <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
   <script defer src="https://pyscript.net/latest/pyscript.js"></script>
@@ -12,7 +15,8 @@
     [[fetch]]
     files = ["./main.py","./test.jpg"]
   </py-config>
- </head>
+</head>
+
 <body>
   <py-script src="main.py"></py-script>
   <h1>Analiza i przetwarzanie obrazów</h1>
@@ -20,23 +24,16 @@
   <h3>1. Wczytanie obrazu:</h3>
   <form action="..." enctype="multipart/form-data">
     <input type="file" id="fileUpload" name="filename" accept="image/*">
-    <button
-      id="upload"
-      class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"
-      type="button"
-      onclick="handleFileUpload()"
-      
-    >Zapisz
+    <button id="upload" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="button"
+      onclick="handleFileUpload()">Zapisz
     </button>
   </form>
   <h3>2. Wybór punktu początkowego i końcowego ścieżki:</h3>
-  <button
-      id="corner-btn"
-      class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"
-      type="submit"
-      py-click="calculateShortestPath()"
-    >Oblicz sciezke
+  <h3>3. Oblicz ścieżkę</h3>
+  <button id="corner-btn" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="submit"
+    py-click="calculateShortestPath()">Oblicz ścieżkę
   </button>
+  <h3>4. Wynik:</h3>
   <div id="matplotlib-lineplot"></div>
 </body>
 
