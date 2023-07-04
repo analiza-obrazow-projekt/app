@@ -3,6 +3,7 @@ var selectedFile;
 let pyodide;
 let imageArray;
 let chosenPoints = [];
+let imageFile = new FileReader();
 
 async function handleFileUpload() {
     var fileInput = document.getElementById('fileUpload');
@@ -38,9 +39,9 @@ async function validatePoints(x, y) {
         fetch(url)
             .then(res => res.blob())
             .then(blob => {
-                    let fr = new FileReader();
-                    fr.readAsArrayBuffer(blob);
-                    setTimeout(() => loadZip(fr), 1500);
+                imageFile = new FileReader();
+                imageFile.readAsArrayBuffer(blob);
+                setTimeout(() => loadZip(imageFile), 1500);
             })
     });
 
