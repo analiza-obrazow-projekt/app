@@ -9,8 +9,9 @@
   <script defer src="https://pyscript.net/latest/pyscript.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.js"></script>
   <script src="main.js"></script>
+  <script src="Stuk-jszip-2ceb998/dist/jszip.js"></script>
   <py-config type="toml">
-    packages = ["matplotlib", "pandas", "opencv-python", "numpy"]
+    packages = ["matplotlib", "pandas", "opencv-python", "numpy", "pillow"]
 
     [[fetch]]
     files = ["./main.py","./test.jpg"]
@@ -29,9 +30,11 @@
     </button>
   </form>
   <h3>2. Wybór punktu początkowego i końcowego ścieżki:</h3>
-  <h3>3. Oblicz ścieżkę</h3>
+  <p>Po wczytaniu obrazu należy zaznaczyć na obrazie 2 punkty leżące na drodze, między którymi nastepnie obliczona będzie najkrótsza ścieżka.</p>
+  <img id="previewImage" src="#" alt="Podgląd" style="display: none; margin-left: auto; margin-right: auto" onclick="choosePoints(event)">
+  <h3>3. Oblicz ścieżkę:</h3>
   <button id="corner-btn" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="submit"
-    py-click="calculateShortestPath()">Oblicz ścieżkę
+          py-click="calculateShortestPath()">Oblicz ścieżkę
   </button>
   <h3>4. Wynik:</h3>
   <div id="matplotlib-lineplot"></div>
