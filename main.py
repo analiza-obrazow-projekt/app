@@ -11,6 +11,14 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import numpy as np
 import os
+import pyodide
+
+def load_image(path):
+    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    thresh, im_bw = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    return im_bw
+
+# pyodide.register_js_function(load_image)
 
 async def calculateShortestPath():
     #TODO: Logic to calculate the shortest path
@@ -25,4 +33,9 @@ def drawResult():
    plt.show(x)
 
 def fileUpload():
-    print("upload file")
+    fi = form['filename']
+    if fi.filename:
+	    # This code will strip the leading absolute path from your file-name
+        load_image(os.path.basename(fi.filename))    
+    print("FILEUPLOAD")
+

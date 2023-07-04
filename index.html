@@ -4,23 +4,14 @@
   <title>Shortest Path Calculator</title>
   <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
   <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.js"></script>
+  <script src="main.js"></script>
   <py-config type="toml">
     packages = ["matplotlib", "pandas", "opencv-python", "numpy"]
 
     [[fetch]]
     files = ["./main.py"]
   </py-config>
-  <py-script>
-    import pyodide, asyncio
-    async def import():
-      await micropip.install("opencv-python")
-      await micropip.install("numpy")
-      await micropip.install("pandas")
-      await micropip.install("matplotlib")
-      print(pyodide.__version__)
-    
-    asyncio.ensure_future(import()) 
-  </py-script>
  </head>
 <body>
   <py-script src="main.py"></py-script>
@@ -33,10 +24,13 @@
       id="upload"
       class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"
       type="button"
-      py-click="fileUpload()"
+      onclick="handleFileUpload()"
+      
     >Zapisz
     </button>
   </form>
+  <h3>2. Wybór punktu początkowego i końcowego ścieżki:</h3>
+
   <button
       id="corner-btn"
       class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical"
