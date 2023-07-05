@@ -42,7 +42,6 @@ textureSize=512
 
 def calculate_shortest_path():
     img = convert_to_binary_array(imageName)
-    tmp=np.transpose(img)
     if check_points(img,start,goal):
         ants=[Ant(start[0],start[1]) for i in range(antNumber)]
         tmp=round(textureSize*math.sqrt(2))
@@ -50,33 +49,32 @@ def calculate_shortest_path():
         while (Ant.desiredPathNumber>0):
             for i in range(len(ants)):
                 ants[i].move(pheromones, img)
-        d = np.zeros((512,512), np.uint8)
-        for j in range(512):
-            d=[1 for i in Ant.paths[0][j] if i]   
-        
+
         # wczytanie mapy
         road_map = cv2.imread(imageName, cv2.COLOR_BGR2GRAY)
 
         # # binaryzacja mapy
         _, road_map_bin = cv2.threshold( road_map, 126, 255, cv2.THRESH_BINARY )
 
-        # wczytanie współrzędnych wskazujących punkty trasy
-        loaded_input = d
-        all_road_coordinates = []
-        NX, NY = loaded_input.shape
-        for x in range(NX):
-            for y in range(NY):
-                if loaded_input[x,y] == True:
-                    all_road_coordinates.append([x,y])
+        best=np.zeros((512,512), np.uint8)
+        for loaded_input in Ant.paths:
+            # wczytanie współrzędnych wskazujących punkty trasy
+            all_road_coordinates = []
+            for x in range(len(loaded_input[0])):
+                for y in range(len(loaded_input[0])):
+                    if loaded_input[x][y]:
+                        all_road_coordinates.append([x,y])
 
-        # output w takiej samej formie, co input, ale z wartościami będącymi szerokością trasy
-        output = np.zeros((512,512), np.uint8)
-        for coordinates in all_road_coordinates:
-            X, Y = coordinates
-            output[X,Y] = getRoadWidth(road_map_bin,coordinates)     
-        show_result_image(output)
+            # output w takiej samej formie, co input, ale z wartościami będącymi szerokością trasy
+            output = np.zeros((512,512), np.uint8)
+            for coordinates in all_road_coordinates:
+                X, Y = coordinates
+                output[X,Y] = getRoadWidth(road_map_bin,coordinates)
+            if np.sum(output)<np.sum(best) or np.sum(best)==0:
+                best=output
+        show_result_image(best)
     else:
-        display("Wybrane punkty nie znajdują się na ścieżce", target="result")  
+        display("Wybrane punkty nie znajdują się na ścieżce", target="result")
 
 def show_input_image():
     fig, ax = plt.subplots()
@@ -90,7 +88,7 @@ def show_points():
     display(start, target="points")
     display("goal:", target="points")
     display(goal, target="points")
-    
+
 def check_points(img, start, goal):
     try:
         startOK = (img[start[0]][start[1]]==255)
@@ -102,6 +100,8 @@ def check_points(img, start, goal):
 
 def show_result_image(output):
     fig, ax = plt.subplots()
+    output=output.astype(int)
+    output=np.where(output > 0, 255, output)
     plt.imshow(output)
     display(fig, target="result")
 
@@ -123,7 +123,7 @@ def convert_to_binary_array(path):
 class Ant:
     #liczba dróg które mają zostać znalezione
     desiredPathNumber=10
-    
+
     #tablica na sciezki
     paths=[]
     def __init__(self, x, y):
@@ -182,16 +182,16 @@ class Ant:
 
 
     def move(self, pheromones, img):
-        self.getdirection(pheromones, img)    
+        self.getdirection(pheromones, img)
 
 # Znajdź szerokość trasy w danym punkcie dla zbinaryzowanej mapy drogowej
 def getRoadWidth(road_map_bin, coordinates):
-    
+
     R = 1
     segments_count = 0
     first_segment_found_iteration = -1 # moment "pojawienia się" pierwszego segmentu
     current_iteration = 0
-    
+
     # część wspólna brzegów i okręgu, dopóki nie istnieją co najmniej 2 segmenty
     while segments_count < 2:
 
@@ -223,4 +223,4 @@ def getRoadWidth(road_map_bin, coordinates):
         first_segment_found_iteration = current_iteration
 
     # Policzenie szerokości trasy w danym koordynacie
-    return (current_iteration - 1)*2 - (current_iteration - first_segment_found_iteration - 1)   
+    return (current_iteration - 1)*2 - (current_iteration - first_segment_found_iteration - 1)
