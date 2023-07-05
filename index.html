@@ -14,7 +14,7 @@
     packages = ["matplotlib", "pandas", "opencv-python", "numpy", "pillow"]
 
     [[fetch]]
-    files = ["./main.py","./test.jpg","./data.csv"]
+    files = ["./main.py","./test2.jpg","./start.csv","./goal.csv"]
   </py-config>
 </head>
 
@@ -29,7 +29,7 @@
   <div id="input"></div>
   <h3>2. Wczytane punkty:</h3>
   <button id="corner-btn" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="submit"
-  py-click="show_points()">Pokaż obraz
+  py-click="show_points()">Pokaż punkty
   </button>
   <div id="points"></div>
   <h3>3. Oblicz ścieżkę:</h3>
