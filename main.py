@@ -1,4 +1,5 @@
 import asyncio
+import os
 import cv2
 import json
 import js
@@ -12,6 +13,8 @@ import math
 from matplotlib import pyplot
 import random
 import pyodide
+import pandas as pd
+
 
 
 # pyodide.register_js_function(load_image)
@@ -19,10 +22,10 @@ import pyodide
 antNumber=125
 
 #punkt z którego mrówki zaczynają (jeśli na polu czarnym mrówki pozostaną w miejscu)
-start= [62,504]
+start= np.loadtxt("start.csv", delimiter=",", dtype='i').tolist()
 
 #punkt docelowy
-goal = [443,56]
+goal = np.loadtxt("goal.csv", delimiter=",", dtype='i').tolist()
 # start= [200, 404]
 # goal = [62,504]
 # start= [62,504]
@@ -32,60 +35,75 @@ goal = [443,56]
 speed=4
 
 #obraz - nazwa pliku
-imageName="test.jpg"
+imageName="test2.jpg"
 
 #rozmiar obrazu powyżej (nie dawać więcej niż 512 bo nie testowane)
 textureSize=512
 
-def calculateShortestPath():
-
-    ants=[Ant(start[0],start[1]) for i in range(antNumber)]
-    tmp=round(textureSize*math.sqrt(2))
-    pheromones = [[tmp-round(math.sqrt(math.pow(i-goal[0],2)+math.pow(j-goal[1],2))) for j in range(textureSize)] for i in range(textureSize)]
+def calculate_shortest_path():
     img = convert_to_binary_array(imageName)
     tmp=np.transpose(img)
-    while (Ant.desiredPathNumber>0):
-        for i in range(len(ants)):
-            ants[i].move(pheromones, img)
-    #TODO: Logic to calculate the shortest path
+    if check_points(img,start,goal):
+        ants=[Ant(start[0],start[1]) for i in range(antNumber)]
+        tmp=round(textureSize*math.sqrt(2))
+        pheromones = [[tmp-round(math.sqrt(math.pow(i-goal[0],2)+math.pow(j-goal[1],2))) for j in range(textureSize)] for i in range(textureSize)]
+        while (Ant.desiredPathNumber>0):
+            for i in range(len(ants)):
+                ants[i].move(pheromones, img)
+        d = np.zeros((512,512), np.uint8)
+        for j in range(512):
+            d=[1 for i in Ant.paths[0][j] if i]   
+        
+        # wczytanie mapy
+        road_map = cv2.imread(imageName, cv2.COLOR_BGR2GRAY)
 
-    for j in range(512):
-        d=[i for i in Ant.paths[0][j] if i]
-        print(d)
-    drawResult()
-    readFile("test.jpg")
-    showImage()
-             
-    
-def drawResult():
+        # # binaryzacja mapy
+        _, road_map_bin = cv2.threshold( road_map, 126, 255, cv2.THRESH_BINARY )
+
+        # wczytanie współrzędnych wskazujących punkty trasy
+        loaded_input = d
+        all_road_coordinates = []
+        NX, NY = loaded_input.shape
+        for x in range(NX):
+            for y in range(NY):
+                if loaded_input[x,y] == True:
+                    all_road_coordinates.append([x,y])
+
+        # output w takiej samej formie, co input, ale z wartościami będącymi szerokością trasy
+        output = np.zeros((512,512), np.uint8)
+        for coordinates in all_road_coordinates:
+            X, Y = coordinates
+            output[X,Y] = getRoadWidth(road_map_bin,coordinates)     
+        show_result_image(output)
+    else:
+        display("Wybrane punkty nie znajdują się na ścieżce", target="result")  
+
+def show_input_image():
     fig, ax = plt.subplots()
-    # x axis
-    x = ["Python", "C++", "JavaScript", "Golang"]
-    # y axis
-    y = [10, 5, 9, 7]
-    plt.plot(x, y, marker='o', linestyle='-', color='b')
-    # Naming the x-label
-    plt.xlabel('Language')
-    # Naming the y-label
-    plt.ylabel('Score')
+    image = cv2.imread(imageName)
+    ax.imshow(image)
+    ax.invert_yaxis()
+    display(fig, target="input")
+
+def show_points():
+    display("start:", target="points")
+    display(start, target="points")
+    display("goal:", target="points")
+    display(goal, target="points")
     
-    # Naming the title of the plot
-    plt.title('Language vs Score')
-    display(fig,target="matplotlib-lineplot")
-    
+def check_points(img, start, goal):
+    try:
+        startOK = (img[start[0]][start[1]]==255)
+        goalOK = (img[goal[0]][goal[1]]==255)
+        return (startOK and goalOK)
+    except IndexError as e:
+        return False
 
-def fileUpload():
-    print("upload file")
 
-def readFile(filename):
-    display("wczytana tablica",target="matplotlib-lineplot")
-    display(cv2.imread(filename),target="matplotlib-lineplot")
-
-def showImage():
+def show_result_image(output):
     fig, ax = plt.subplots()
-    plt.imshow(cv2.imread("test.jpg"))
-    display("wczytany obraz",target="matplotlib-lineplot")
-    display(fig, target="matplotlib-lineplot")
+    plt.imshow(output)
+    display(fig, target="result")
 
 def bgr2rgb(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -165,3 +183,44 @@ class Ant:
 
     def move(self, pheromones, img):
         self.getdirection(pheromones, img)    
+
+# Znajdź szerokość trasy w danym punkcie dla zbinaryzowanej mapy drogowej
+def getRoadWidth(road_map_bin, coordinates):
+    
+    R = 1
+    segments_count = 0
+    first_segment_found_iteration = -1 # moment "pojawienia się" pierwszego segmentu
+    current_iteration = 0
+    
+    # część wspólna brzegów i okręgu, dopóki nie istnieją co najmniej 2 segmenty
+    while segments_count < 2:
+
+        # pusty obrazek o analogicznych wymiarach, co mapa
+        road_map_frame = np.zeros(road_map_bin.shape, np.uint8)
+
+        # rysowanie okręgu o promieniu R
+        cv2.circle(road_map_frame, coordinates, R, (255,255,255), -1 );
+
+        # część wspólna z brzegami przy drodzę
+        road_map_circle_XOR = cv2.bitwise_xor(road_map_bin, road_map_frame)
+        intersection = cv2.bitwise_and(road_map_circle_XOR, road_map_frame)
+
+        # segmentacja części wspólnej i zapisanie ilość znalezionych segmentów
+        contours, hierarchy = cv2.findContours(intersection[:,:,0], cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+        # zliczanie znalezionych konturów
+        segments_count = len(contours)
+
+        # sprawdzanie, czy pojawił się pierwszy kontur
+        if segments_count == 1 and first_segment_found_iteration == -1:
+            first_segment_found_iteration = current_iteration
+
+        current_iteration = current_iteration + 1
+        R = R + 1
+
+    # Sprawdzanie, czy oba segmenty zostały znalezione jednocześnie
+    if first_segment_found_iteration == -1:
+        first_segment_found_iteration = current_iteration
+
+    # Policzenie szerokości trasy w danym koordynacie
+    return (current_iteration - 1)*2 - (current_iteration - first_segment_found_iteration - 1)   

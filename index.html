@@ -14,7 +14,7 @@
     packages = ["matplotlib", "pandas", "opencv-python", "numpy", "pillow"]
 
     [[fetch]]
-    files = ["./main.py","./test.jpg"]
+    files = ["./main.py","./test2.jpg","./start.csv","./goal.csv"]
   </py-config>
 </head>
 
@@ -22,26 +22,22 @@
   <py-script src="main.py"></py-script>
   <h1>Analiza i przetwarzanie obrazów</h1>
   <h2>Projekt - Wyszukiwanie najkrótszej ścieżki na obrazie</h2>
-  <h3>1. Wczytanie obrazu:</h3>
-  <form action="..." enctype="multipart/form-data">
-    <input type="file" id="fileUpload" name="filename" accept="image/*">
-    <button id="upload" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="button"
-      onclick="handleFileUpload()">Zapisz
-    </button>
-  </form>
-  <h3>2. Wybór punktu początkowego i końcowego ścieżki:</h3>
-  <p>Po wczytaniu obrazu należy zaznaczyć na obrazie 2 punkty leżące na drodze, między którymi nastepnie obliczona będzie najkrótsza ścieżka. Walidacja wyboru chwilę trwa, dlatego należy czekać na uzupełnienie pola "Punkt początkowy/końcowy" lub alert o niepoprawnym wyborze.</p>
-  <img id="previewImage" src="#" alt="Podgląd" style="display: none; margin-left: auto; margin-right: auto" onclick="choosePoints(event)">
-  <div>
-    <p style="display: inline-block">Punkt początkowy: </p>
-    <p id="startPoint" style="display: none"></p>
-  </div>
-  <div>
-    <p style="display: inline-block">Punkt końcowy: </p>
-    <p id="endPoint" style="display: none"></p>
-  </div>
+  <h3>1. Wczytany obraz:</h3>
+  <button id="corner-btn" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="submit"
+  py-click="show_input_image()">Pokaż obraz
+  </button>
+  <div id="input"></div>
+  <h3>2. Wczytane punkty:</h3>
+  <button id="corner-btn" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="submit"
+  py-click="show_points()">Pokaż punkty
+  </button>
+  <div id="points"></div>
   <h3>3. Oblicz ścieżkę:</h3>
   <button id="corner-btn" class="p-2 text-white bg-blue-600 border border-blue-600 rounded vertical" type="submit"
+          py-click="calculate_shortest_path()">Oblicz ścieżkę
+  </button>
+  <h3>4. Wynik:</h3>
+  <div id="result"></div>
           onclick="calculatePath()">Oblicz ścieżkę
   </button>
   <h3>4. Wynik:</h3>
